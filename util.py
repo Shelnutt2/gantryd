@@ -11,7 +11,11 @@ def enum(*sequential, **named):
 
 ReportLevels = enum(BACKGROUND=-2, EXTRA=-1, NORMAL=0, IMPORTANT=1)
 
-client = docker.Client(version='auto')
+client = None
+
+def connectDockerClient(docker_url):
+  global client
+  client = docker.Client(base_url=docker_url, version='auto')
 
 def pickUnusedPort():
   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -47,4 +51,6 @@ def fail(reason, project=None, component=None, exception=None):
 
 def getDockerClient():
   """ Returns the docker client. """
+  if client is None:
+      connectDockerClient('unix://var/run/docker.sock')
   return client

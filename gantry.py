@@ -7,7 +7,7 @@ import time
 from actions import start_action, update_action, list_action, stop_action, kill_action
 from config.GantryConfig import Configuration
 from runtime.manager import RuntimeManager
-from util import report, fail
+from util import report, fail, connectDockerClient
 
 
 ACTIONS = {
@@ -57,7 +57,8 @@ def run():
   parser.add_argument('action', help='The action to perform', choices=ACTIONS.keys())
   parser.add_argument('component_name', help='The name of the component to manage')
   parser.add_argument('-m', dest='monitor', action='store_true', help='If specified and the action is "start" or "update", gantry will remain running to monitor components, auto restarting them as necessary')
-  parser.add_argument('--setconfig', dest='config_overrides', action='append', help='Configuration overrides for the component')
+  parser.add_argument('-o-setconfig', dest='config_overrides', action='append', help='Configuration overrides for the component')
+  parser.add_argument('-H', '--host', dest='docker_url', default='unix://var/run/docker.sock', help='Set url for docker host, defaults to unix://var/run/docker.sock')
 
   args = parser.parse_args()
   component_name = args.component_name
@@ -65,6 +66,10 @@ def run():
   should_monitor = args.monitor
   config_file = args.config_file
   config_overrides = args.config_overrides
+  docker_url = args.docker_url
+
+  # Connect to docker
+  connectDockerClient(docker_url)
 
   # Load the config.
   config = loadConfig(config_file)
@@ -78,7 +83,7 @@ def run():
   component = manager.getComponent(component_name)
   if not component:
     raise Exception('Unknown component: ' + component_name)
-    
+
   # Apply the config overrides (if any).
   if config_overrides:
     component.applyConfigOverrides(config_overrides)
