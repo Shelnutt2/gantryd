@@ -70,10 +70,15 @@ def start():
   parser.add_argument('-c', help='A component to watch and run', nargs='+', type=str, dest='component')
   parser.add_argument('-etcd', help='The etcd endpoint to which the client should connect. Defaults to 127.0.0.1', dest='etcd_host', nargs='?', const=ETCD_HOST)
   parser.add_argument('-etcdport', help='The client port of the etcd endpoint. Defaults to 4001.', dest='etcd_port', nargs='?', const=ETCD_PORT)
+  parser.add_argument('-H', '--host', dest='docker_url', default='unix://var/run/docker.sock', help='Set url for docker host, defaults to unix://var/run/docker.sock')
 
   # Parse the arguments.
   args = parser.parse_args()
   port = int(args.etcd_port) if args.etcd_port else ETCD_PORT
+  docker_url = args.docker_url
+
+  # Connect to docker
+  connectDockerClient(docker_url)
 
   # Initialize the gantryd client.
   dclient = GantryDClient(args.etcd_host or ETCD_HOST, args.project, port)
