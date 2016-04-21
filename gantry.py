@@ -57,7 +57,7 @@ def run():
   parser.add_argument('action', help='The action to perform', choices=ACTIONS.keys())
   parser.add_argument('component_name', help='The name of the component to manage')
   parser.add_argument('-m', dest='monitor', action='store_true', help='If specified and the action is "start" or "update", gantry will remain running to monitor components, auto restarting them as necessary')
-  parser.add_argument('-o-setconfig', dest='config_overrides', action='append', help='Configuration overrides for the component')
+  parser.add_argument('--setconfig', dest='config_overrides', action='append', help='Configuration overrides for the component')
   parser.add_argument('-H', '--host', dest='docker_url', default='unix://var/run/docker.sock', help='Set url for docker host, defaults to unix://var/run/docker.sock')
 
   args = parser.parse_args()
